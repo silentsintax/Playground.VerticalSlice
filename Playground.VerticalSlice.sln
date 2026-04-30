@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.1.11312.151 d18.0
+VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AA6D3955-8264-4C8C-91D9-2B82B852C212}"
 EndProject
@@ -12,6 +12,16 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Playground.VerticalSlice.Application", "src\Playground.VerticalSlice.Application\Playground.VerticalSlice.Application.csproj", "{3BFF6245-F6D0-4147-B0CE-CD20A8BBF462}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Playground.VeticalSlice.UnitTests", "tests\Playground.VeticalSlice.UnitTests\Playground.VeticalSlice.UnitTests.csproj", "{0B3673C5-787A-4E2D-B892-BB4DDA7E9E06}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{E52C1D86-A2AC-48E4-B55A-79427DB77028}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{B09D60B2-8A5B-461F-8E0F-41896CDF8FDF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "monads", "monads", "{AC3F39A4-CF13-44AD-9344-7295B7992247}"
+	ProjectSection(SolutionItems) = preProject
+		maybe.md = maybe.md
+		result.md = result.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +49,8 @@ Global
 		{0AC74172-C7BB-4179-BFD5-25C860A78EE1} = {AA6D3955-8264-4C8C-91D9-2B82B852C212}
 		{3BFF6245-F6D0-4147-B0CE-CD20A8BBF462} = {AA6D3955-8264-4C8C-91D9-2B82B852C212}
 		{0B3673C5-787A-4E2D-B892-BB4DDA7E9E06} = {C88C222F-C0FF-4002-9E79-AF840005E561}
+		{B09D60B2-8A5B-461F-8E0F-41896CDF8FDF} = {E52C1D86-A2AC-48E4-B55A-79427DB77028}
+		{AC3F39A4-CF13-44AD-9344-7295B7992247} = {B09D60B2-8A5B-461F-8E0F-41896CDF8FDF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E82E5182-824D-4FCA-8598-97023A336AC7}
