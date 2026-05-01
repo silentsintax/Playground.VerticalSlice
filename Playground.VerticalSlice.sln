@@ -19,8 +19,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{B09D60
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "monads", "monads", "{AC3F39A4-CF13-44AD-9344-7295B7992247}"
 	ProjectSection(SolutionItems) = preProject
-		maybe.md = maybe.md
-		result.md = result.md
+		docs\maybe.md = docs\maybe.md
+		docs\result.md = docs\result.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "api", "api", "{56FA88A6-BAF0-4D03-857F-97CF9DA0F9EF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "endpoints", "endpoints", "{37186061-40D2-4835-AEBC-F9FC03F0C296}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "extensions", "extensions", "{69ECE50F-FA15-4502-BD13-730CD5F47E4C}"
+	ProjectSection(SolutionItems) = preProject
+		docs\resultExtensions.md = docs\resultExtensions.md
 	EndProjectSection
 EndProject
 Global
@@ -51,6 +60,9 @@ Global
 		{0B3673C5-787A-4E2D-B892-BB4DDA7E9E06} = {C88C222F-C0FF-4002-9E79-AF840005E561}
 		{B09D60B2-8A5B-461F-8E0F-41896CDF8FDF} = {E52C1D86-A2AC-48E4-B55A-79427DB77028}
 		{AC3F39A4-CF13-44AD-9344-7295B7992247} = {B09D60B2-8A5B-461F-8E0F-41896CDF8FDF}
+		{56FA88A6-BAF0-4D03-857F-97CF9DA0F9EF} = {E52C1D86-A2AC-48E4-B55A-79427DB77028}
+		{37186061-40D2-4835-AEBC-F9FC03F0C296} = {56FA88A6-BAF0-4D03-857F-97CF9DA0F9EF}
+		{69ECE50F-FA15-4502-BD13-730CD5F47E4C} = {37186061-40D2-4835-AEBC-F9FC03F0C296}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E82E5182-824D-4FCA-8598-97023A336AC7}
