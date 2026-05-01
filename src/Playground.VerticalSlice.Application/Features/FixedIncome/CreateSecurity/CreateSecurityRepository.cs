@@ -4,12 +4,12 @@ namespace Playground.VerticalSlice.Application.Features.FixedIncome.CreateSecuri
 {
     public interface ICreateSecurityRepository 
     {
-        Task<Result<int>> CreateSecurity();
+        Task<Result<int>> CreateSecurity(CreateSecuritEntity security);
     }
 
     public class CreateSecurityRepository : ICreateSecurityRepository
     {
-        public async Task<Result<int>> CreateSecurity()
+        public async Task<Result<int>> CreateSecurity(CreateSecuritEntity security)
         {
             await Task.Delay(100);
             

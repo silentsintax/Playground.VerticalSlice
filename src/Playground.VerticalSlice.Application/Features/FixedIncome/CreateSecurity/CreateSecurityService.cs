@@ -16,10 +16,12 @@ namespace Playground.VerticalSlice.Application.Features.FixedIncome.CreateSecuri
         {
             try
             {
-                if (request is null || string.IsNullOrEmpty(request.securityName))
-                    return Result<CreateSecurityResponse>.Failure(Error.Validation("Informe o nome do papel"));
+                var validationResult = new CreateSecurityValidator().Validate(request);
 
-                var security = await repository.CreateSecurity();
+                if (!validationResult.IsValid)
+                    return Result<CreateSecurityResponse>.Failure(Error.Validation(validationResult.Errors.Select(e => e.ErrorMessage).ToArray()));
+                
+                var security = await repository.CreateSecurity(CreateSecurityMapping.MapToEntity(request));
 
                 if (security.isFailure)
                     return Result<CreateSecurityResponse>.Failure(Error.Validation("Failed to create security."));
