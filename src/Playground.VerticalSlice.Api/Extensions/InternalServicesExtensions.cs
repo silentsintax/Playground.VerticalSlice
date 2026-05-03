@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using FluentValidation;
 using Playground.VerticalSlice.Application.Features.FixedIncome.CreateSecurity;
+using Playground.VerticalSlice.Application.Features.FixedIncome.SearchSecurity;
 using Playground.VerticalSlice.Application.Shared.Helpers;
 using System.Text.Json.Serialization;
 
@@ -13,7 +14,9 @@ namespace Playground.VerticalSlice.Api.Extensions
             SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
             services.AddScoped<IValidator<CreateSecurityRequest>, FixedIncomeSecurityValidator>();
             services.AddScoped<ICreateSecurityService, CreateSecurityService>();
+            services.AddScoped<ISearchSecurityService, SearchSecurityService>();
             services.AddScoped<ICreateSecurityRepository>(_ => new CreateSecurityRepository(configuration.GetConnectionString("DefaultConnection")!));
+            services.AddScoped<ISearchSecurityRepository>(_ => new SearchSecurityRepository(configuration.GetConnectionString("DefaultConnection")!));
 
             services.ConfigureHttpJsonOptions(options =>
             {
