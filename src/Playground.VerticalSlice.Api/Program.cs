@@ -10,7 +10,7 @@ namespace Playground.VerticalSlice.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddInternalServices();
+            builder.Services.AddInternalServices(builder.Configuration);
             builder.Services.AddOpenApi();
 
             var app = builder.Build();

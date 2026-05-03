@@ -16,12 +16,12 @@ namespace Playground.VerticalSlice.Application.Features.FixedIncome.CreateSecuri
         {
             try
             {
-                var validationResult = new CreateSecurityValidator().Validate(request);
+                var validationResult = new FixedIncomeSecurityValidator().Validate(request);
 
                 if (!validationResult.IsValid)
                     return Result<CreateSecurityResponse>.Failure(Error.Validation(validationResult.Errors.Select(e => e.ErrorMessage).ToArray()));
                 
-                var security = await repository.CreateSecurity(CreateSecurityMapping.MapToEntity(request));
+                var security = await repository.CreateSecurity(CreateSecurityMapping.MapToEntity(request), ct);
 
                 if (security.isFailure)
                     return Result<CreateSecurityResponse>.Failure(Error.Validation("Failed to create security."));
@@ -30,7 +30,7 @@ namespace Playground.VerticalSlice.Application.Features.FixedIncome.CreateSecuri
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "An error occurred while creating a security with name {SecurityName}", request.securityName);
+                logger.LogError(ex, "An error occurred while creating a security with name {SecurityName}", request.Name);
 
                 return Result<CreateSecurityResponse>.Failure(Error.InternalServerError("An unexpected error occurred while creating the security."));
             }
