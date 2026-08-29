@@ -1,0 +1,13 @@
+{
+  "name": "dotnet-story-mcp-server",
+  "version": "1.0.0",
+  "description": "Servidor MCP local, sem vendor lock-in, expondo build/test/format/estado para desenvolvimento de histórias .NET em container Docker",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4"
+  }
+}

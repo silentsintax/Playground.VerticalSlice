@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "dotnet-story-harness": {
+      "command": "node",
+      "args": ["mcp-server/index.js"],
+      "cwd": ".harness"
+    }
+  }
+}

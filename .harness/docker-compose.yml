@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  dotnet-sandbox:
+    image: mcr.microsoft.com/dotnet/sdk:10.0
+    container_name: dotnet-story-sandbox
+    # Este arquivo vive em meu_repo_git/.harness/docker-compose.yml.
+    # ".." sobe para a raiz do repo; ajuste "src" abaixo se sua .sln estiver
+    # em outro caminho dentro do repositório.
+    working_dir: /workspace
+    volumes:
+      - ..:/workspace
+      # cache de pacotes NuGet persistente entre execuções, evita re-restore a cada loop
+      - nuget-cache:/root/.nuget/packages
+    environment:
+      - DOTNET_CLI_TELEMETRY_OPTOUT=1
+      - DOTNET_NOLOGO=1
+    # mantém o container vivo em background; o orquestrador usa "docker exec" nele
+    command: tail -f /dev/null
+    networks:
+      - sandbox-net
+
+networks:
+  sandbox-net:
+    driver: bridge
+
+volumes:
+  nuget-cache:
