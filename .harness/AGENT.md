@@ -26,6 +26,14 @@ Este projeto é existente (brownfield). Antes de qualquer história:
    história, mesmo que pareça uma melhoria óbvia. Registre a observação no resumo
    final em vez de agir sobre ela.
 
+## Skills disponíveis
+Antes de começar, verifique se há uma skill relevante em `skills/*.md` para o tipo
+de mudança desta história (ex: história de endpoint HTTP → leia
+`skills/minimal-api-endpoint.md` primeiro). Skills existem para não repetir manualmente
+em cada história as convenções que já são fixas no time — se o comportamento pedido
+na história conflitar com o que a skill descreve, a skill vence, a menos que a
+história diga explicitamente para desviar (e justifique o motivo).
+
 ## Definition of Done (ajustado para brownfield)
 Uma história só está pronta quando, nessa ordem:
 1. `dotnet_build` retorna ok

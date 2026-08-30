@@ -1,5 +1,9 @@
 # História: <nome>
 
+## Skills relevantes
+<liste aqui, se houver, ex: `skills/minimal-api-endpoint.md` — deixe em branco se
+nenhuma skill existente se aplica>
+
 ## Contexto
 <módulo/projeto afetado, regra de negócio relevante>
 
