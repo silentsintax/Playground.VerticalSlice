@@ -29,16 +29,16 @@ group.MapGet("/by-isin", async (
 > os nomes usados aqui são placeholders baseados no padrão vertical slice.
 
 - Pode alterar:
-  - `Playground.VerticalSlice.Api.Endpoints.FixedIncomeEndpoints.cs` — adicionar o novo `MapGet("/by-name", ...)` ao lado dele)
+  - `src/Features/Securities/SecurityEndpoints.cs` (ou onde estiver o `group.MapGet`
+    do `/by-isin` — adicionar o novo `MapGet("/by-name", ...)` ao lado dele)
   - `src/Features/Securities/ISearchSecurityService.cs` (adicionar a assinatura
     `GetByNameAsync`)
-  - `Playground.VerticalSlice.Application.Features.FixedIncome.SearchSecurity/SearchSecurityService.cs` (— implementar
+  - `src/Features/Securities/SearchSecurityService.cs` (ou equivalente — implementar
     `GetByNameAsync`)
   - Projeto de testes correspondente (mesmo projeto/pasta onde já existem testes de
     `GetByIsinAsync`, se existirem; caso não existam testes para `GetByIsinAsync`
     hoje, seguir o padrão de nomenclatura/estrutura de testes já usado em outra
     feature do repositório)
- - `Ignore o erro  error NU1903: Package 'Microsoft.OpenApi' 2.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-v5pm-xwqc-g5wc`
 - Não pode alterar:
   - O endpoint `/by-isin` existente (nem sua assinatura, nem seu comportamento)
   - Qualquer outro método de `ISearchSecurityService` além do novo `GetByNameAsync`

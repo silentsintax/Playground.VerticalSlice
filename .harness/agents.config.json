@@ -1,0 +1,53 @@
+{
+  "_comentario": "Config central dos agentes suportados. Ajuste isto UMA VEZ por time/repositório — os desenvolvedores nunca precisam editar este arquivo no dia a dia, só escolher --agent (e opcionalmente --model) na hora de rodar. A sintaxe exata de cada CLI muda com frequência: confira a documentação oficial de cada ferramenta se um comando parar de funcionar.",
+
+  "claude": {
+    "command": "claude",
+    "checkArgs": ["--version"],
+    "args": ["-p", "{prompt}"],
+    "modelFlag": "--model",
+    "mcpSetup": null,
+    "_nota": "Claude Code lê .mcp.json na raiz do repo automaticamente. Modelos: sonnet, opus, haiku, ou o nome completo (ex: claude-opus-5)."
+  },
+
+  "copilot": {
+    "command": "copilot",
+    "checkArgs": ["--version"],
+    "args": [
+      "-p", "{prompt}",
+      "--allow-tool", "shell(dotnet build)",
+      "--allow-tool", "shell(dotnet test)",
+      "--allow-tool", "shell(dotnet format)",
+      "--no-ask-user"
+    ],
+    "modelFlag": "--model",
+    "mcpSetup": {
+      "checkArgs": ["mcp", "list"],
+      "checkContains": "dotnet-story-harness",
+      "addArgs": [
+        "mcp", "add", "dotnet-story-harness",
+        "--command", "node",
+        "--args", "mcp-server/index.js",
+        "--cwd", "."
+      ]
+    },
+    "_nota": "GitHub Copilot CLI (não confundir com o antigo 'gh copilot suggest'). Rode 'copilot /model' interativo uma vez para ver os nomes exatos disponíveis na sua conta."
+  },
+
+  "devin": {
+    "command": "devin",
+    "checkArgs": ["--version"],
+    "args": ["-p", "{prompt}"],
+    "modelFlag": "--model",
+    "mcpSetup": {
+      "checkArgs": ["mcp", "list"],
+      "checkContains": "dotnet-story-harness",
+      "addArgs": [
+        "mcp", "add", "dotnet-story-harness",
+        "--command", "node",
+        "--args", "mcp-server/index.js"
+      ]
+    },
+    "_nota": "Devin CLI (produto local, separado da Devin Cloud). Modelos: opus, sonnet, swe, codex, gemini, ou 'adaptive' (padrão, escolhe automaticamente)."
+  }
+}

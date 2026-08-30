@@ -116,7 +116,40 @@ async function cmdNewStory(slug) {
   console.log(`Criado: ${dest}`);
 }
 
-async function checkDefinitionOfDone() {
+async function loadAgentsConfig() {
+  const raw = await fs.readFile(path.join(HARNESS_DIR, "agents.config.json"), "utf-8");
+  const config = JSON.parse(raw);
+  delete config._comentario;
+  return config;
+}
+
+async function agentIsInstalled(agentConfig) {
+  const res = await runCapture(agentConfig.command, agentConfig.checkArgs || ["--version"]);
+  return res.ok || res.output.length > 0; // alguns CLIs retornam código != 0 em --version
+}
+
+async function ensureMcpRegistered(agentName, agentConfig) {
+  if (!agentConfig.mcpSetup) return; // agente descobre MCP sozinho (ex: Claude Code)
+
+  const { checkArgs, checkContains, addArgs } = agentConfig.mcpSetup;
+  const check = await runCapture(agentConfig.command, checkArgs);
+  if (check.output.includes(checkContains)) {
+    return; // já registrado, não faz nada
+  }
+
+  console.log(`Registrando MCP server para '${agentName}' (primeira vez apenas)...`);
+  const add = await runCapture(agentConfig.command, addArgs);
+  if (!add.ok) {
+    console.warn(
+      `Aviso: não foi possível registrar o MCP server automaticamente para '${agentName}'.\n` +
+        `Saída: ${add.output.slice(-500)}\n` +
+        `Verifique a sintaxe atual com '${agentConfig.command} mcp --help' e ajuste ` +
+        `'mcpSetup.addArgs' em agents.config.json se necessário. Prosseguindo mesmo assim.`
+    );
+  }
+}
+
+
   const build = await dockerExec(["dotnet", "build", "-warnaserror", "--nologo"]);
   if (!build.ok) return { ok: false, stage: "build", output: build.output };
 
@@ -129,16 +162,64 @@ async function checkDefinitionOfDone() {
   return { ok: true };
 }
 
-async function cmdRun(storyFile, maxIter, agentParts) {
-  if (!storyFile || agentParts.length === 0) {
+async function cmdRun(storyFile, maxIter, agentName, modelName, rawAgentParts) {
+  if (!storyFile) {
     console.error(
-      "Uso: node harness.js run <historia.md> [--max-iter N] -- <comando-do-agente...>"
+      "Uso: node harness.js run <historia.md> --agent <nome> [--max-iter N]\n" +
+        "  ou: node harness.js run <historia.md> [--max-iter N] -- <comando-do-agente...>\n" +
+        "Agentes configurados: node harness.js agents"
     );
     process.exit(1);
   }
 
-  console.log(`== Desenvolvendo história: ${storyFile} ==`);
-  const [agentCmd, ...agentArgs] = agentParts;
+  let buildArgs; // função (prompt) => [comando, ...args]
+
+  if (rawAgentParts.length > 0) {
+    // Modo avançado: comando explícito após "--", ignora agents.config.json
+    const [cmd, ...args] = rawAgentParts;
+    buildArgs = (prompt) => [cmd, [...args, prompt]];
+  } else {
+    if (!agentName) {
+      console.error("Especifique --agent <nome> ou use '-- <comando>'. Veja: node harness.js agents");
+      process.exit(1);
+    }
+    const agents = await loadAgentsConfig();
+    const agentConfig = agents[agentName];
+    if (!agentConfig) {
+      console.error(
+        `Agente '${agentName}' não está em agents.config.json. Disponíveis: ${Object.keys(agents).join(", ")}`
+      );
+      process.exit(1);
+    }
+    if (!(await agentIsInstalled(agentConfig))) {
+      console.error(
+        `Comando '${agentConfig.command}' não encontrado no PATH. Instale/autentique o ` +
+          `CLI de '${agentName}' antes de continuar.`
+      );
+      process.exit(1);
+    }
+    await ensureMcpRegistered(agentName, agentConfig);
+
+    const modelArgs =
+      modelName && agentConfig.modelFlag ? [agentConfig.modelFlag, modelName] : [];
+    if (modelName && !agentConfig.modelFlag) {
+      console.warn(
+        `Aviso: '${agentName}' não tem 'modelFlag' definido em agents.config.json — ` +
+          `o --model informado será ignorado.`
+      );
+    }
+
+    buildArgs = (prompt) => [
+      agentConfig.command,
+      [...modelArgs, ...agentConfig.args.map((a) => a.replace("{prompt}", prompt))],
+    ];
+  }
+
+  console.log(
+    `== Desenvolvendo história: ${storyFile} (agente: ${agentName || "customizado"}` +
+      (modelName ? `, modelo: ${modelName}` : "") +
+      ") =="
+  );
 
   for (let i = 1; i <= maxIter; i++) {
     console.log(`\n--- Iteração ${i}/${maxIter} ---`);
@@ -148,7 +229,8 @@ async function cmdRun(storyFile, maxIter, agentParts) {
       `Iteração ${i}/${maxIter}. Se existir estado em stories/.state-*, retome de lá. ` +
       `Ao final, atualize o estado com o progresso feito.`;
 
-    await run(agentCmd, [...agentArgs, prompt]);
+    const [cmd, args] = buildArgs(prompt);
+    await run(cmd, args);
 
     const dod = await checkDefinitionOfDone();
     if (dod.ok) {
@@ -162,6 +244,15 @@ async function cmdRun(storyFile, maxIter, agentParts) {
   process.exit(1);
 }
 
+async function cmdAgents() {
+  const agents = await loadAgentsConfig();
+  console.log("Agentes configurados em agents.config.json:\n");
+  for (const [name, cfg] of Object.entries(agents)) {
+    const installed = (await agentIsInstalled(cfg)) ? "instalado" : "NÃO encontrado no PATH";
+    console.log(`  ${name.padEnd(10)} comando: ${cfg.command.padEnd(10)} [${installed}]`);
+  }
+}
+
 // ---------- Parsing de argumentos (sem depender de libs externas) ----------
 
 async function main() {
@@ -173,23 +264,41 @@ async function main() {
     await cmdBaseline();
   } else if (command === "new-story") {
     await cmdNewStory(rest[0]);
+  } else if (command === "agents") {
+    await cmdAgents();
   } else if (command === "run") {
     const dashIndex = rest.indexOf("--");
     const beforeDash = dashIndex === -1 ? rest : rest.slice(0, dashIndex);
     const agentParts = dashIndex === -1 ? [] : rest.slice(dashIndex + 1);
 
-    const storyFile = beforeDash.find((a) => !a.startsWith("--"));
     const maxIterFlagIndex = beforeDash.indexOf("--max-iter");
-    const maxIter =
-      maxIterFlagIndex !== -1 ? parseInt(beforeDash[maxIterFlagIndex + 1], 10) : 15;
+    const maxIter = maxIterFlagIndex !== -1 ? parseInt(beforeDash[maxIterFlagIndex + 1], 10) : 15;
 
-    await cmdRun(storyFile, maxIter, agentParts);
+    const agentFlagIndex = beforeDash.indexOf("--agent");
+    const agentName = agentFlagIndex !== -1 ? beforeDash[agentFlagIndex + 1] : undefined;
+
+    const modelFlagIndex = beforeDash.indexOf("--model");
+    const modelName = modelFlagIndex !== -1 ? beforeDash[modelFlagIndex + 1] : undefined;
+
+    // Primeiro argumento posicional (não é uma flag "--x" nem o valor logo após uma) é o arquivo da história
+    const flagValuePositions = new Set(
+      [maxIterFlagIndex, agentFlagIndex, modelFlagIndex]
+        .filter((i) => i !== -1)
+        .map((i) => i + 1)
+    );
+    const positional = beforeDash.find(
+      (a, idx) => !a.startsWith("--") && !flagValuePositions.has(idx)
+    );
+
+    await cmdRun(positional, maxIter, agentName, modelName, agentParts);
   } else {
     console.log(`Comandos disponíveis:
   node harness.js setup
   node harness.js baseline
   node harness.js new-story <slug>
-  node harness.js run <historia.md> [--max-iter N] -- <comando-do-agente...>`);
+  node harness.js agents
+  node harness.js run <historia.md> --agent <nome> [--model <nome-do-modelo>] [--max-iter N]
+  node harness.js run <historia.md> [--max-iter N] -- <comando-do-agente...>  (modo avançado)`);
     process.exit(1);
   }
 }
